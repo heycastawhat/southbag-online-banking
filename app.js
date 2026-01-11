@@ -88,3 +88,14 @@ document.addEventListener('DOMContentLoaded', function() {
     attachResetButton();
   }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+  const toggle = document.getElementById('darkModeToggle');
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      // Oops: forgot to save preference to localStorage
+      // Oops: button text doesn't change to "Light Mode"
+    });
+  }
+});

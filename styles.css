@@ -29,3 +29,35 @@ label {
 .submitbutton::after {
     content: "submit";
 }
+
+
+body.dark-mode {
+    background-color: black;
+}
+
+body.dark-mode h1 {
+    color: black;
+}
+
+body.dark-mode h2 {
+    color:black;
+}
+
+body.dark-mode p {
+    /* Forgot to style paragraphs */
+}
+
+body.dark-mode input {
+    background-color: #111111;
+    color: #111111;
+    border: 1px solid #111111;
+}
+
+body.dark-mode button {
+    background-color: pink;
+   
+}
+
+body.dark-mode label {
+    color: #2a2a2a; 
+}
