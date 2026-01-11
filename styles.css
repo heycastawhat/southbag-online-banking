@@ -1,0 +1,31 @@
+.btn-small {
+    font-size: 3px;
+    padding: 2px 8px;
+}
+
+.btn-large {
+    font-size: 24px;
+    padding: 15px 30px;
+}
+
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+
+
+/* Swap label positions */
+label {
+    display: inline-block;
+    transform: rotate(180deg);
+}
+
+/* Comic Sans for maximum pain */
+* {
+    font-family: 'Comic Sans MS', cursive !important;
+}
+
+.submitbutton::after {
+    content: "submit";
+}
