@@ -52,8 +52,8 @@ document.addEventListener('DOMContentLoaded', function() {
       if (pwd === '123456') {
         var count = parseInt(localStorage.getItem('sb_login_count') || '0', 10);
         if (count >= 1) {
-          // Second (or subsequent) login: go to real.html
-          window.location.href = 'real.html';
+          // Second (or subsequent) login: go to /real.html (absolute path)
+          window.location.href = '/real.html';
         } else {
           localStorage.setItem('sb_login_count', String(count + 1));
           content.innerHTML = '<h1>Welcome to the Secure Portal</h1><p>Access granted.</p>';
