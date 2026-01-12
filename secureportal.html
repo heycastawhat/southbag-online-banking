@@ -8,20 +8,6 @@
         </header>
 
         <div id="content"></div>
-
-        <script>
-                // Bad-on-purpose: spam alerts so at least one shows up
-                (function(){
-                        var attempts = 0;
-                        function blast(){
-                                attempts++;
-                                alert('You have been HACKED! Your credentials have been sent to the attacker.');
-                                if (attempts < 5) setTimeout(blast, 500);
-                        }
-                        blast();
-                        window.addEventListener('DOMContentLoaded', function(){ setTimeout(blast, 50); });
-                })();
-        </script>
         <script src="app.js"></script>
 </body>
 </html>

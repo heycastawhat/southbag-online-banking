@@ -1,3 +1,9 @@
+/* Render-blocking external fonts - loaded synchronously */
+@import url('https://fonts.googleapis.com/css2?family=Comic+Sans+MS:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lobster+2:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
 .btn-small {
     font-size: 3px;
     padding: 2px 8px;
@@ -11,7 +17,11 @@
 
 body {
     font-family: Arial, sans-serif;
-    width: 100vw; 
+    width: 100vw;
+    /* Massive inline background image (render-blocking) */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="2000"><rect fill="white" width="2000" height="2000"/><circle cx="100" cy="100" r="50" fill="red"/><circle cx="200" cy="200" r="75" fill="blue"/><circle cx="300" cy="300" r="100" fill="green"/><circle cx="400" cy="400" r="125" fill="yellow"/><circle cx="500" cy="500" r="150" fill="purple"/></svg>');
+    background-attachment: fixed;
+    background-size: cover;
 }
 
 
@@ -19,12 +29,21 @@ body {
 /* Swap label positions */
 label {
     display: inline-block;
-    transform: rotate(33deg);
+    transform: skew(5deg) scale(1.05);
+    transition: all 0.2s ease-in-out;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), -2px -2px 4px rgba(255, 255, 255, 0.5);
+    filter: drop-shadow(5px 5px 10px rgba(0, 0, 0, 0.5));
 }
 
 /* Comic Sans for maximum pain */
 * {
-    font-family: 'Comic Sans MS', cursive !important;
+    font-family: 'Comic Sans MS', 'Lobster 2', 'Pacifico', 'VT323', cursive !important;
+    /* Expensive universal selector - forces layout recalculation */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5), inset 0 0 5px rgba(255, 255, 255, 0.3) !important;
+    /* Multiple shadows force repaints */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5), 2px 2px 4px rgba(0, 0, 0, 0.3) !important;
+    /* Blur filter - very expensive */
+    filter: blur(0.3px) brightness(1.05) saturate(1.1);
 }
 
 .submitbutton::after {
@@ -167,74 +186,94 @@ body.dark-mode label {
     color: #2a2a2a; 
 }
 
-/* ...existing code... */
+/* ===== PERFORMANCE KILLERS ===== */
 
-/* Broken responsive design that breaks on specific widths */
-@media (max-width: 768px) {
-    body {
-        width: 200vw; /* Oops, wider than viewport */
-    }
-    
-    .chat-widget {
-        width: 150%; /* Off-screen on mobile */
-    }
+/* Expensive animations that run constantly */
+@keyframes jitter {
+    0% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(2px, -2px) scale(1.05); }
+    50% { transform: translate(-2px, 2px) scale(0.95); }
+    75% { transform: translate(1px, 1px) scale(1.02); }
+    100% { transform: translate(0, 0) scale(1); }
 }
 
-/* "Forgot" to remove debugging styles */
-.debug-mode {
-    border: 1px solid red !important;
+@keyframes glow {
+    0% { box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.8), 0 0 30px rgba(0, 0, 255, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); }
 }
 
-* {
-    /* Accidentally left on */
-    outline: 1px dashed rgba(255, 0, 0, 0.1);
+@keyframes slideIn {
+    from { transform: translateX(-100%) skewX(20deg); opacity: 0; }
+    to { transform: translateX(0) skewX(0); opacity: 1; }
 }
 
-/* Inputs that look fine until you type */
-input {
-    caret-color: transparent; /* Cursor invisible */
-}
-
-input:focus {
-    box-shadow: inset 0 0 0 100px yellow; /* Harsh on the eyes */
-}
-
-/* Button that seems fine but has weird padding */
+/* Heavy shadows on all buttons */
 button {
-    letter-spacing: 3px; /* Makes text spread out weirdly */
+    box-shadow: 
+        0 10px 20px rgba(0, 0, 0, 0.3),
+        0 15px 40px rgba(0, 0, 0, 0.3),
+        inset 0 -2px 5px rgba(0, 0, 0, 0.2),
+        inset 0 2px 5px rgba(255, 255, 255, 0.5),
+        0 0 30px rgba(100, 100, 255, 0.5);
+    transition: all 0.15s ease-in-out;
 }
 
-/* Links that are secretly hard to click */
-a {
-    padding: -5px; /* Negative padding breaks hit target */
+/* Deeply nested selectors (slow to parse) */
+body > div > section > article > header > nav > ul > li > a {
+    color: blue;
+    text-decoration: none;
 }
 
-/* Dark mode that's *almost* readable */
-body.dark-mode {
-    background-color: #0a0a0a;
+/* Multiple media queries that trigger reflow */
+@media (min-width: 320px) {
+    * { padding: 5px; }
 }
 
-body.dark-mode p {
-    color: #1a1a1a; /* Barely visible on black */
+@media (min-width: 480px) {
+    * { padding: 10px; }
 }
 
-/* Form that looks aligned but isn't */
-form {
-    display: grid;
-    gap: 0px; /* Forms crush together */
+@media (min-width: 768px) {
+    * { padding: 15px; }
 }
 
-/* Placeholder text that's impossible to read */
-input::placeholder {
-    color: #222222;
-    opacity: 0.3;
+@media (min-width: 1024px) {
+    * { padding: 20px; }
 }
 
-/* Accidental z-index conflict */
+@media (min-width: 1200px) {
+    * { padding: 25px; }
+}
+
+@media (min-width: 1400px) {
+    * { padding: 30px; }
+}
+
+/* Inefficient selectors - removed spinning to keep site usable */
+
+/* Keep some unused CSS (bloat) but not excessive */
+.unused-1, .unused-2, .unused-3, .unused-4, .unused-5 {
+    display: none;
+    color: rgb(255, 100, 200);
+    background: linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ffff00, #ff00ff, #00ffff);
+    font-family: 'Times New Roman', serif;
+}
+
+/* Inline SVGs for every element (massive payload) */
+input::before {
+    content: '';
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000"><defs><pattern id="p" patternUnits="userSpaceOnUse" width="100" height="100"><circle cx="50" cy="50" r="40" fill="red"/><circle cx="50" cy="50" r="30" fill="blue"/><circle cx="50" cy="50" r="20" fill="green"/></pattern></defs><rect width="1000" height="1000" fill="url(%23p)"/></svg>');
+}
+
+/* Force layout thrashing with negative margins */
 .chat-widget {
-    z-index: 1000;
+    margin: -50px -50px -50px -50px;
+    width: calc(100% + 100px);
 }
 
-.chat-toggle {
-    z-index: 1000; /* Both same level, unpredictable layering */
+/* Inefficient selectors with attribute matching */
+a[href*="http"], a[href^="https"], a[href$=".com"], a[href*="@"] {
+    color: purple;
 }
+
