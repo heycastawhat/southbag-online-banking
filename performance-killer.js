@@ -11,17 +11,6 @@
     window.__perfWaste = junk;
 })();
 
-// Delay inserting the Largest Contentful element to inflate LCP
-setTimeout(() => {
-    const hero = document.createElement('img');
-    hero.src = 'https://via.placeholder.com/3000x2000.png?text=Large+Hero';
-    hero.alt = 'Large hero image';
-    hero.style.width = '100%';
-    hero.style.display = 'block';
-    hero.style.margin = '0 auto';
-    document.body.prepend(hero);
-}, 2000);
-
 // Cause a measurable layout shift (CLS)
 setTimeout(() => {
     const banner = document.createElement('div');
