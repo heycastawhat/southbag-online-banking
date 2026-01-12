@@ -149,3 +149,58 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+function showMeetingPopup() {
+    const popup = document.createElement('div');
+    popup.id = 'meetingPopup';
+    popup.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 0;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      z-index: 10000;
+      width: 400px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      border: 1px solid #dadce0;
+    `;
+    popup.innerHTML = `
+      <div style="padding: 24px 24px 20px 24px;">
+        <div style="font-size: 13px; color: #5f6368; margin-bottom: 20px;">southbag.com says</div>
+        <div style="font-size: 13px; color: #202124; line-height: 1.4; margin-bottom: 24px;">
+          Please schedule an in-person meeting at your local SouthBag branch to continue.
+        </div>
+        <div style="text-align: right; border-top: 1px solid #e8eaed; padding-top: 16px; margin: 0 -24px -20px -24px; padding-left: 24px; padding-right: 24px;">
+          <button id="closePopup" style="background: #1a73e8; color: white; border: none; padding: 8px 24px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; min-width: 65px;">OK</button>
+        </div>
+      </div>
+    `;
+    
+    const overlay = document.createElement('div');
+    overlay.id = 'popupOverlay';
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      z-index: 9999;
+    `;
+    
+    document.body.appendChild(overlay);
+    document.body.appendChild(popup);
+    
+    document.getElementById('closePopup').addEventListener('click', () => {
+      popup.remove();
+      overlay.remove();
+    });
+  }
+
+  // Show popup randomly between 10-30 seconds after page load
+  const randomDelay = Math.floor(Math.random() * 20000) + 10000;
+  setTimeout(showMeetingPopup, randomDelay);
+});
