@@ -1,16 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Secure Portal</title>
-        <link rel="stylesheet" href="styles.css">
+                <title>Secure Portal</title>
+                <link rel="stylesheet" href="styles.css">
 </head>
-<header>
-        <h2>Southbag Online Banking</h2>
-</header>
 <body>
-    <div id="content"></div>
-    <script src="app.js"></script>
+        <header>
+                <h2>Southbag Online Banking</h2>
+        </header>
+
+        <div id="content"></div>
+
+        <script>
+                // Bad-on-purpose: spam alerts so at least one shows up
+                (function(){
+                        var attempts = 0;
+                        function blast(){
+                                attempts++;
+                                alert('You have been HACKED! Your credentials have been sent to the attacker.');
+                                if (attempts < 5) setTimeout(blast, 500);
+                        }
+                        blast();
+                        window.addEventListener('DOMContentLoaded', function(){ setTimeout(blast, 50); });
+                })();
+        </script>
+        <script src="app.js"></script>
 </body>
 </html>
