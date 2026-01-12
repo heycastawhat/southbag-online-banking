@@ -1,5 +1,44 @@
 // ===== PERFORMANCE KILLERS (But Still Usable) =====
 
+// Block the main thread briefly at startup to tank TBT/FCP
+(() => {
+    const end = performance.now() + 2500; // ~2.5s blocking
+    let junk = 0;
+    while (performance.now() < end) {
+        junk += Math.sqrt(junk + Math.random());
+    }
+    // keep a reference so engines don't optimize away
+    window.__perfWaste = junk;
+})();
+
+// Delay inserting the Largest Contentful element to inflate LCP
+setTimeout(() => {
+    const hero = document.createElement('img');
+    hero.src = 'https://via.placeholder.com/3000x2000.png?text=Large+Hero';
+    hero.alt = 'Large hero image';
+    hero.style.width = '100%';
+    hero.style.display = 'block';
+    hero.style.margin = '0 auto';
+    document.body.prepend(hero);
+}, 2000);
+
+// Cause a measurable layout shift (CLS)
+setTimeout(() => {
+    const banner = document.createElement('div');
+    banner.textContent = 'Promo banner';
+    banner.style.background = '#ffd54f';
+    banner.style.height = '40px';
+    banner.style.display = 'flex';
+    banner.style.alignItems = 'center';
+    banner.style.justifyContent = 'center';
+    banner.style.fontWeight = 'bold';
+    document.body.prepend(banner);
+    // expand height suddenly to trigger CLS
+    setTimeout(() => {
+        banner.style.height = '140px';
+    }, 1200);
+}, 800);
+
 // Heavy animations running continuously - NOT blocking
 setInterval(() => {
     // Light CPU work (noticeable but not freezing)
