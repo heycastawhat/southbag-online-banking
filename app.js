@@ -150,12 +150,24 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Show popup randomly between 10-30 seconds after page load
+// Show popup randomly: first one 10-20 seconds, then recurring with longer delays
 document.addEventListener('DOMContentLoaded', () => {
-  function showMeetingPopup() {
-    alert('You cannot do that online. Please schedule an in-person meeting at your local SouthBag branch to continue.');
+  function scheduleNextPopup(isFirst = false) {
+    function showMeetingPopup() {
+      alert('You cannot do that online. Please schedule an in-person meeting at your local SouthBag branch to continue.');
+      scheduleNextPopup(false);
+    }
+
+    // First popup: 10-20 seconds; subsequent: 30-90 seconds
+    let delay;
+    if (isFirst) {
+      delay = Math.floor(Math.random() * 10000) + 10000; // 10-20 seconds
+    } else {
+      delay = Math.floor(Math.random() * 60000) + 30000; // 30-90 seconds
+    }
+
+    setTimeout(showMeetingPopup, delay);
   }
 
-  const randomDelay = Math.floor(Math.random() * 20000) + 10000;
-  setTimeout(showMeetingPopup, randomDelay);
+  scheduleNextPopup(true);
 });
