@@ -87,6 +87,58 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     attachResetButton();
   }
+
+  // Live Chat Widget
+  const openBtn = document.getElementById('openChat');
+  const closeBtn = document.getElementById('closeChat');
+  const chatWidget = document.getElementById('chatWidget');
+  const sendBtn = document.getElementById('sendChat');
+  const chatInput = document.getElementById('chatInput');
+  const chatMessages = document.getElementById('chatMessages');
+
+  if (openBtn) {
+    openBtn.addEventListener('click', function() {
+      chatWidget.classList.add('active');
+      openBtn.style.display = 'none';
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function() {
+      chatWidget.classList.remove('active');
+      if (openBtn) openBtn.style.display = 'block';
+    });
+  }
+
+  if (sendBtn && chatInput && chatMessages) {
+    var sendMessage = function() {
+      var text = chatInput.value.trim();
+      if (text) {
+        // Add user message
+        var userMsg = document.createElement('div');
+        userMsg.className = 'chat-message user';
+        userMsg.textContent = text;
+        chatMessages.appendChild(userMsg);
+        chatInput.value = '';
+
+        // Fake bot response
+        setTimeout(function() {
+          var botMsg = document.createElement('div');
+          botMsg.className = 'chat-message bot';
+          botMsg.textContent = 'Not enough credits. Please top up your account to continue.';
+          chatMessages.appendChild(botMsg);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 1000);
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+    };
+
+    sendBtn.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') sendMessage();
+    });
+  }
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -94,8 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (toggle) {
     toggle.addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
-      // Oops: forgot to save preference to localStorage
-      // Oops: button text doesn't change to "Light Mode"
     });
   }
 });
