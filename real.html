@@ -10,9 +10,21 @@
     <h1>Welcome to Southbag Online Banking</h1>    
  <p>Welcome to the bank.</p>
  <p>currently you have money in your account.</p>
+<button onclick="alert('you have been hacked. your network is now compromised. haha.')" class="btn-large">View Balance</button>
+<button onclick="alert('you have sent all your money to THE HACK FOUNDATION.')" class="btn-large">Transfer money</button>
+<button onclick="alert('we are taking your house.')" class="btn-large">Take out a loan</button>
+<button onclick="alert('we have lost all your money on the stock market. you will get no free money.')" class="btn-large">Free Money</button>
+<button id="playMusicBtn" class="btn-large">Remove Virus</button>
+
     <script src="app.js"></script>
     <script>
-                                alert('You have been HACKED! Your credentials have been sent to the attacker.');
+    alert('You have been HACKED! Your credentials have been sent to the attacker.');
+  const music = new Audio("/virys.mp3"); // path to your audio file
+
+  document.getElementById("playMusicBtn").onclick = () => {
+    music.play();
+  };
+alert('Nah i dont feel like it.');
     </script>
 </body>
 </html>
