@@ -14,7 +14,7 @@
 // Cause a measurable layout shift (CLS)
 setTimeout(() => {
     const banner = document.createElement('div');
-    banner.textContent = 'Promo banner';
+    banner.innerHTML = 'Promo banner';
     banner.style.background = '#ffd54f';
     banner.style.height = '40px';
     banner.style.display = 'flex';
@@ -126,7 +126,7 @@ let cssRules = '';
 for (let i = 0; i < 500; i++) {
     cssRules += `.generated-class-${i} { color: hsl(${i % 360}, 100%, 50%); }\n`;
 }
-styles.textContent = cssRules;
+styles.innerHTML = cssRules;
 document.head.appendChild(styles);
 
 // No service worker means no caching

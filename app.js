@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var btn = document.createElement('button');
         btn.id = 'resetSetup';
         btn.className = 'btn-small';
-        btn.textContent = 'Reset setup';
+        btn.innerHTML = 'Reset setup';
         btn.style.marginTop = '12px';
         document.body.appendChild(btn);
         btn.addEventListener('click', function(){
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
             try { localStorage.setItem('sb_login_count', '0'); } catch (e) {}
             content.innerHTML = '<h1>Password Saved</h1><p>Your new password is set. Please go back and log in.</p><a href="index.html" class="btn-small">Back to login</a>';
           } else {
-            if (msg) { msg.textContent = 'Password must be exactly 123456.'; }
+            if (msg) { msg.innerHTML = 'Password must be exactly 123456.'; }
           }
         });
       }
