@@ -1,6 +1,3 @@
-// ===== PERFORMANCE KILLERS (But Still Usable) =====
-
-// Block the main thread briefly at startup to tank TBT/FCP
 (() => {
     const end = performance.now() + 2500; // ~2.5s blocking
     let junk = 0;
@@ -14,9 +11,9 @@
 // Cause a measurable layout shift (CLS)
 setTimeout(() => {
     const banner = document.createElement('div');
-    banner.innerHTML = 'Promo banner';
-    banner.style.background = '#ffd54f';
-    banner.style.height = '40px';
+    banner.innerHTML = 'Promotional banner: promotional bnner: promotional banner: promotional banner: promotional banner';
+    banner.style.background = '#fffa63';
+    banner.style.height = '50px';
     banner.style.display = 'flex';
     banner.style.alignItems = 'center';
     banner.style.justifyContent = 'center';
