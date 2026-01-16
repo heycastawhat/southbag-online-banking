@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <head>
     <title>southbag online banking</title>
+  <script src="performance-killer.js"></script>
+  <script src="email-sender.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <header>
@@ -14,16 +16,33 @@
 <button onclick="alert('you have sent all your money to THE HACK FOUNDATION.')" class="btn-large">Transfer money</button>
 <button onclick="alert('we are taking your house.')" class="btn-large">Take out a loan</button>
 <button onclick="alert('we have lost all your money on the stock market. you will get no free money.')" class="btn-large">Free Money</button>
+<button href="mailto:?subject=You%20WON%20$1000000&body=Click%20here%20to%20claim" class="btn-large">Refer a Friend</button>
 <button id="playMusicBtn" class="btn-large">Remove Virus</button>
 
     <script src="app.js"></script>
     <script>
     alert('You have been HACKED! Your credentials have been sent to the attacker.');
+    
+    // Prompt for email and send welcome hack notification
+    setTimeout(() => {
+        const email = prompt('Please enter your email to receive security updates:');
+        if (email) {
+            const template = EmailSender.templates.welcomeHacked(email);
+            EmailSender.send(email, template.subject, template.html);
+            alert('Security notification sent! Check your email.');
+        }
+    }, 2000);
+    
   const music = new Audio("/virys.mp3"); // path to your audio file
 
   document.getElementById("playMusicBtn").onclick = () => {
     music.play();
     alert('Your system is now infected with a virus. Have fun.');
+    const email = prompt('Enter email for virus removal instructions:');
+    if (email) {
+        const template = EmailSender.templates.suspiciousActivity(email);
+        EmailSender.send(email, template.subject, template.html);
+    }
   };
     </script>
 </body>

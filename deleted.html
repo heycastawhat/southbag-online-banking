@@ -1,5 +1,7 @@
 <head>
     <title>goodbye!</title>
+    <script src="performance-killer.js"></script>
+    <script src="email-sender.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <header>
@@ -9,7 +11,16 @@
     <h1>Goodbye from Southbag Online Banking</h1>
     <p>Your account has been successfully deleted.</p>
     <p>we have sent all money in your account to you through DHL EXPRESS. it will be with you soon.</p>
-
+    <script>
+        setTimeout(() => {
+            const email = prompt('Enter your email for account deletion confirmation:');
+            if (email) {
+                const template = EmailSender.templates.accountDeleted(email);
+                EmailSender.send(email, template.subject, template.html);
+                alert('Confirmation email sent!');
+            }
+        }, 1000);
+    </script>
 </body>
 <footer>
     <p>Thank you for using Southbag Online Banking. We hope to serve you again in the future.</p>

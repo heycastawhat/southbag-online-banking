@@ -1,0 +1,13 @@
+{
+  "name": "southbag-online-banking",
+  "version": "1.0.0",
+  "description": "Deliberately terrible banking website",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "resend": "^3.0.0"
+  },
+  "devDependencies": {}
+}
