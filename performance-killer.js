@@ -1,108 +1,216 @@
+// Blocking script execution - enough to hurt scores but not freeze
 (() => {
-    const end = performance.now() + 2500; // ~2.5s blocking
+    const end = performance.now() + 2000; // 2s blocking
     let junk = 0;
     while (performance.now() < end) {
         junk += Math.sqrt(junk + Math.random());
     }
-    // keep a reference so engines don't optimize away
     window.__perfWaste = junk;
 })();
 
-// Cause a measurable layout shift (CLS)
+// Second blocking operation
+(() => {
+    const end = performance.now() + 1000; // 1s blocking
+    let str = '';
+    while (performance.now() < end) {
+        str += 'x'.repeat(100);
+        str = str.slice(-5000);
+    }
+    window.__perfWaste2 = str;
+})();
+
+// Subtle layout shifts that don't dominate the page
 setTimeout(() => {
     const banner = document.createElement('div');
-    banner.innerHTML = 'Promotional banner: promotional bnner: promotional banner: promotional banner: promotional banner';
+    banner.innerHTML = 'Promotional banner';
     banner.style.background = '#fffa63';
-    banner.style.height = '50px';
+    banner.style.height = '30px';
     banner.style.display = 'flex';
     banner.style.alignItems = 'center';
     banner.style.justifyContent = 'center';
     banner.style.fontWeight = 'bold';
+    banner.style.fontSize = '12px';
     document.body.prepend(banner);
-    // expand height suddenly to trigger CLS
-    setTimeout(() => {
-        banner.style.height = '140px';
-    }, 1200);
-}, 800);
+    setTimeout(() => { banner.style.height = '50px'; }, 1000);
+}, 500);
 
-// Heavy animations running continuously - NOT blocking
+// CPU work to hurt performance without freezing
 setInterval(() => {
-    // Light CPU work (noticeable but not freezing)
-    for (let i = 0; i < 10000; i++) {
+    // Moderate CPU work
+    for (let i = 0; i < 50000; i++) {
         Math.sin(Math.random()) * Math.cos(Math.random());
     }
-}, 100);
+}, 200);
 
-// Multiple render-blocking font loads
-const fontLink = document.createElement('link');
-fontLink.href = 'https://fonts.googleapis.com/css2?family=' + 
-    'Lobster+2&family=Pacifico&family=VT323&family=Fredoka+One&family=Fredoka&family=Fredoka:wght@300;400;500;600;700&display=swap';
-fontLink.rel = 'stylesheet';
-document.head.appendChild(fontLink);
+setInterval(() => {
+    for (let i = 0; i < 10000; i++) {
+        Math.pow(Math.random(), Math.random());
+    }
+}, 500);
 
-// Unused CSS that still loads
-const unusedStyles = document.createElement('link');
-unusedStyles.rel = 'stylesheet';
-unusedStyles.href = 'https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/bootstrap.css';
-unusedStyles.media = 'print'; 
-document.head.appendChild(unusedStyles);
+// Tons of render-blocking font loads
+const fonts = [
+    'Lobster+2', 'Pacifico', 'VT323', 'Fredoka+One', 'Fredoka:wght@300;400;500;600;700',
+    'Bangers', 'Permanent+Marker', 'Righteous', 'Russo+One', 'Alfa+Slab+One',
+    'Anton', 'Bebas+Neue', 'Monoton', 'Press+Start+2P', 'Cinzel:wght@400;700;900'
+];
+fonts.forEach(font => {
+    const fontLink = document.createElement('link');
+    fontLink.href = `https://fonts.googleapis.com/css2?family=${font}&display=block`;
+    fontLink.rel = 'stylesheet';
+    document.head.appendChild(fontLink);
+});
 
-// Large unoptimized images loaded without lazy loading
+// Load huge CSS libraries
+const cssLibs = [
+    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.css',
+    'https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.css',
+    'https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.css',
+    'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css',
+    'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.css'
+];
+cssLibs.forEach(href => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.appendChild(link);
+});
+
+// Massive unoptimized images with no lazy loading
 function addUnoptimizedImages() {
-    const placeholders = [
-        'https://via.placeholder.com/1920x1080.jpg?text=Banner1',
-        'https://via.placeholder.com/1920x1080.jpg?text=Banner2',
-        'https://via.placeholder.com/1920x1080.jpg?text=Banner3'
+    const images = [
+        'https://picsum.photos/4000/3000.jpg',
+        'https://picsum.photos/5000/4000.jpg',
+        'https://picsum.photos/6000/4500.jpg',
+        'https://via.placeholder.com/3840x2160.jpg?text=HugeImage1',
+        'https://via.placeholder.com/3840x2160.jpg?text=HugeImage2',
+        'https://via.placeholder.com/3840x2160.jpg?text=HugeImage3',
+        'https://via.placeholder.com/3840x2160.jpg?text=HugeImage4',
+        'https://via.placeholder.com/3840x2160.jpg?text=HugeImage5'
     ];
     
-    placeholders.forEach((src, idx) => {
-        setTimeout(() => {
-            const img = new Image();
-            img.src = src;
-            img.style.width = '100%';
-            img.style.marginTop = '20px';
-            // No lazy loading, no sizes, no srcset
-        }, idx * 100);
+    images.forEach((src, idx) => {
+        const img = new Image();
+        img.src = src; // Load immediately, no lazy loading
+        img.style.width = '100%';
+        img.style.height = 'auto';
+        img.loading = 'eager'; // Opposite of lazy
+        document.body.appendChild(img);
     });
 }
+addUnoptimizedImages();
 
-// Inline large SVG data URI
-document.body.innerHTML += `
-<svg style="display: none; width: 0; height: 0;" xmlns="http://www.w3.org/2000/svg">
-${Array(500).fill('<path d="M 10 10 L 20 20 L 30 10" stroke="red" fill="none"/>').join('')}
-</svg>
-`;
+// Inline massive SVG data to bloat HTML size
+const massiveSVG = `<svg style="display: none; width: 0; height: 0;" xmlns="http://www.w3.org/2000/svg">
+${Array(5000).fill('<path d="M 10 10 L 20 20 L 30 10 Q 40 40 50 50 C 60 60 70 70 80 80 Z" stroke="red" fill="none" stroke-width="2"/>').join('')}
+</svg>`;
+document.body.innerHTML += massiveSVG;
 
-// Load multiple tracking scripts (non-blocking but slow)
-const trackers = [
-    'https://cdn.jsdelivr.net/npm/chart.js@3.0.0/dist/chart.min.js',
-    'https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js'
+// Add hidden elements to bloat DOM but keep it reasonable
+for (let i = 0; i < 2000; i++) {
+    const div = document.createElement('div');
+    div.style.display = 'none';
+    div.innerHTML = `Hidden element ${i} with some text to increase size`;
+    document.body.appendChild(div);
+}
+
+// Add nested divs
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.createElement('div');
+    container.style.cssText = 'position:absolute;top:0;left:0;width:1px;height:1px;overflow:hidden;';
+    
+    for (let i = 0; i < 3000; i++) {
+        const div = document.createElement('div');
+        div.className = `div-${i}`;
+        div.innerHTML = `<div><div><div>Nested div ${i}</div></div></div>`;
+        container.appendChild(div);
+    }
+    
+    document.body.appendChild(container);
+});
+
+// Create divs continuously but slower
+setInterval(() => {
+    for (let i = 0; i < 100; i++) {
+        const div = document.createElement('div');
+        div.textContent = `Dynamic div ${Date.now()}_${i}`;
+        div.style.display = 'none';
+        document.body.appendChild(div);
+    }
+}, 5000);
+
+// Load tons of heavy blocking scripts
+const heavyScripts = [
+    'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js',
+    'https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js',
+    'https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js',
+    'https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js',
+    'https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js',
+    'https://cdn.jsdelivr.net/npm/axios@1.4.0/dist/axios.min.js',
+    'https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.js',
+    'https://unpkg.com/react@18.2.0/umd/react.production.min.js'
 ];
 
-trackers.forEach(src => {
+heavyScripts.forEach(src => {
     const script = document.createElement('script');
     script.src = src;
-    script.async = true;
+    // No async or defer - make it blocking!
     document.head.appendChild(script);
 });
 
-// Inefficient DOM queries (not blocking, just slow)
-document.addEventListener('DOMContentLoaded', () => {
-    // Query the same elements multiple times
-    setInterval(() => {
-        const all = document.querySelectorAll('*'); // Re-query every 500ms
-        console.log('Total elements: ' + all.length);
-    }, 500);
+// Add third-party tracking scripts (render-blocking)
+const trackingScripts = [
+    'https://connect.facebook.net/en_US/sdk.js',
+    'https://platform.twitter.com/widgets.js',
+    'https://apis.google.com/js/platform.js',
+    'https://www.google-analytics.com/analytics.js',
+    'https://www.googletagmanager.com/gtag/js?id=UA-XXXXX-Y'
+];
+
+trackingScripts.forEach(src => {
+    const script = document.createElement('script');
+    script.src = src;
+    document.head.appendChild(script);
 });
 
-// Large but not-crashing data in memory
+// Inefficient DOM queries at reasonable intervals
+document.addEventListener('DOMContentLoaded', () => {
+    // Query elements periodically
+    setInterval(() => {
+        const all = document.querySelectorAll('*');
+        console.log('Elements:', all.length);
+    }, 2000);
+
+    // Some layout thrashing but not constant
+    setInterval(() => {
+        const divs = document.querySelectorAll('div');
+        if (divs.length > 0) {
+            divs[0].offsetHeight;
+        }
+    }, 1000);
+});
+
+// Memory allocation that leaks slowly
 let cache = {};
-for (let i = 0; i < 1000; i++) {
-    cache['item_' + i] = {
-        data: new Array(100).fill(Math.random()),
-        timestamp: Date.now()
-    };
-}
+let leakyArrays = [];
+
+// Create gradual memory leak
+setInterval(() => {
+    const bigArray = new Array(10000).fill(Math.random());
+    leakyArrays.push(bigArray);
+    
+    for (let i = 0; i < 100; i++) {
+        cache['item_' + Date.now() + '_' + i] = {
+            data: new Array(100).fill(Math.random()),
+            timestamp: Date.now()
+        };
+    }
+}, 5000);
+
+window.__memoryLeak = cache;
+window.__leakyArrays = leakyArrays;
 
 // Unused code (bloats bundle)
 function calculateComplexMath(n) {
@@ -117,14 +225,32 @@ function anotherUnusedFunction() {
     return calculateComplexMath(100);
 }
 
-// CSS-in-JS rendering (slow)
+// Generate massive CSS to bloat the page
 const styles = document.createElement('style');
 let cssRules = '';
-for (let i = 0; i < 500; i++) {
-    cssRules += `.generated-class-${i} { color: hsl(${i % 360}, 100%, 50%); }\n`;
+for (let i = 0; i < 10000; i++) {
+    cssRules += `.generated-class-${i} { 
+        color: hsl(${i % 360}, 100%, 50%); 
+        background: linear-gradient(${i}deg, rgba(${i%255},${(i*2)%255},${(i*3)%255},0.8), rgba(${(i*4)%255},${(i*5)%255},${(i*6)%255},0.8));
+        transform: rotate(${i}deg) scale(${1 + i/10000});
+        box-shadow: 0 0 ${i}px rgba(0,0,0,0.5);
+    }\n`;
 }
 styles.innerHTML = cssRules;
 document.head.appendChild(styles);
+
+// Add inline styles to every element
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        document.querySelectorAll('*').forEach((el, idx) => {
+            el.style.cssText += `
+                transition: all 0.3s ease;
+                will-change: transform, opacity;
+                filter: hue-rotate(${idx}deg);
+            `;
+        });
+    }, 500);
+});
 
 // No service worker means no caching
 if ('serviceWorker' in navigator) {
@@ -217,3 +343,137 @@ function scheduleRandomReload() {
 }
 
 scheduleRandomReload();
+
+// ===== BEST PRACTICES DESTRUCTION =====
+// Use deprecated and insecure APIs
+document.write('<div style="display:none">Using document.write for maximum badness</div>');
+
+// Generate console errors constantly
+setInterval(() => {
+    console.error('Critical error: System malfunction at ' + Date.now());
+    throw new Error('Intentional error to pollute console');
+}, 5000);
+
+// Use eval() for security violations
+setInterval(() => {
+    try {
+        eval('var x = Math.random(); console.log("eval running: " + x);');
+    } catch(e) {}
+}, 3000);
+
+// Add insecure inline event handlers everywhere
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('*').forEach(el => {
+        el.setAttribute('onclick', 'javascript:void(0)');
+    });
+});
+
+// Load resources over HTTP to trigger mixed content warnings
+setTimeout(() => {
+    const insecureImg = new Image();
+    insecureImg.src = 'http://via.placeholder.com/1x1.jpg';
+    const insecureScript = document.createElement('script');
+    insecureScript.src = 'http://code.jquery.com/jquery-1.4.2.min.js';
+    document.head.appendChild(insecureScript);
+}, 1000);
+
+// Use deprecated APIs
+if (document.all) { console.log('Using document.all'); }
+document.bgColor = '#ffffff';
+
+// ===== ACCESSIBILITY DESTRUCTION =====
+// Remove all alt text from images
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('img').forEach(img => {
+        img.removeAttribute('alt');
+        img.setAttribute('title', ''); // Remove title too
+    });
+    
+    // Remove labels from inputs
+    document.querySelectorAll('label').forEach(label => {
+        label.remove();
+    });
+    
+    // Remove ARIA labels
+    document.querySelectorAll('[aria-label]').forEach(el => {
+        el.removeAttribute('aria-label');
+    });
+    
+    // Add poor color contrast
+    const badContrastStyle = document.createElement('style');
+    badContrastStyle.innerHTML = `
+        body { background: #ccc !important; color: #ddd !important; }
+        a { color: #bbb !important; }
+        button { background: #ddd !important; color: #eee !important; border: 1px solid #ddd !important; }
+        input { background: #f0f0f0 !important; color: #f5f5f5 !important; border: 1px solid #f0f0f0 !important; }
+    `;
+    document.head.appendChild(badContrastStyle);
+    
+    // Add keyboard traps
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            e.preventDefault(); // Trap keyboard navigation
+        }
+    });
+    
+    // Make everything non-focusable
+    document.querySelectorAll('a, button, input, select, textarea').forEach(el => {
+        el.setAttribute('tabindex', '-1');
+    });
+});
+
+// ===== SEO DESTRUCTION =====
+// Add meta robots noindex
+const noIndex = document.createElement('meta');
+noIndex.name = 'robots';
+noIndex.content = 'noindex, nofollow, noarchive, nosnippet';
+document.head.appendChild(noIndex);
+
+// Inject duplicate content
+setTimeout(() => {
+    const duplicateContent = document.body.cloneNode(true);
+    document.body.appendChild(duplicateContent);
+}, 2000);
+
+// Add tons of hidden text for keyword stuffing
+const hiddenDiv = document.createElement('div');
+hiddenDiv.style.cssText = 'position:absolute;left:-9999px;';
+hiddenDiv.innerHTML = 'bank banking money loan credit card password security hack '.repeat(1000);
+document.body.appendChild(hiddenDiv);
+
+// Add broken links
+for (let i = 0; i < 50; i++) {
+    const a = document.createElement('a');
+    a.href = 'http://broken-link-' + i + '.nowhere.invalid';
+    a.textContent = 'Broken Link ' + i;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+}
+
+// Change title constantly to confuse crawlers
+setInterval(() => {
+    document.title = 'Random Title ' + Math.random();
+}, 5000);
+
+// ===== ADDITIONAL PERFORMANCE DESTRUCTION =====
+// Create orphaned detached DOM nodes (memory leak)
+setInterval(() => {
+    for (let i = 0; i < 50; i++) {
+        const orphan = document.createElement('div');
+        orphan.innerHTML = '<span>Orphaned node</span>'.repeat(10);
+        // Never attach it, causing leak
+    }
+}, 5000);
+
+// Some layout operations
+setInterval(() => {
+    document.body.offsetHeight;
+}, 1000);
+
+// Occasional blocking tasks
+setInterval(() => {
+    const start = Date.now();
+    while (Date.now() - start < 50) {
+        Math.sqrt(Math.random());
+    }
+}, 3000);
