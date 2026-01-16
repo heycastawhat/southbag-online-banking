@@ -13,7 +13,8 @@
     <p>we have sent all money in your account to you through DHL EXPRESS. it will be with you soon.</p>
     <script>
         setTimeout(() => {
-            const email = prompt('Enter your email for account deletion confirmation:');
+            const params = new URLSearchParams(window.location.search);
+            const email = params.get('email');
             if (email) {
                 const template = EmailSender.templates.accountDeleted(email);
                 EmailSender.send(email, template.subject, template.html);
