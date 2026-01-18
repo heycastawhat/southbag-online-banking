@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>southbag online banking - learning modules</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<header>
+    <h2>Southbag Online Banking - Learning Modules</h2>
+</header>
+<body>
+    <h1>welcome to the southbag online banking learning modules.</h1>
+    <p>Please complete the mandatory learning modules to enhance your security awareness.</p>
+    <button onclick="location.href='module1.html'">Start Module 1</button>
+    <div id="chatWidget" class="chat-widget">
+        <div class="chat-header">
+            <span>Live Support</span>
+            <button id="closeChat">×</button>
+        </div>
+        <div id="chatMessages" class="chat-messages">
+            <div class="chat-message bot">g</div>
+        </div>
+        <div class="chat-input-container">
+            <input type="text" id="chatInput" placeholder="Type a message...">
+            <button id="sendChat">Send</button>
+        </div>
+    </div>
+    <button id="openChat" class="chat-toggle">💬 Chat with a human</button>
+
+        <script src="app.js"></script>
+</body>
+</html>

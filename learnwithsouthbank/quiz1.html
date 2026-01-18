@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>southbag online banking</title>
+    <script src="../performance-killer.js"></script>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+        <header>
+                <h2>Southbag Online Banking</h2>
+        </header>
+
+        <main id="quiz">
+                <!-- Quiz renders here by quiz.js -->
+        </main>
+
+        <!-- Quiz content: edit this JSON to copy for other modules -->
+        <script id="quiz-data" type="application/json">
+        {
+            "title": "Module 1 Quiz — Scams",
+            "description": "Answer the questions below about common online scam patterns.",
+            "questions": [
+                {
+                    "text": "You receive an urgent email claiming your bank account will be closed unless you click a link and enter your details. What should you do?",
+                    "type": "single",
+                    "options": [
+                        { "label": "Click the link immediately and log in", "isCorrect": false },
+                        { "label": "Ignore the email and delete it", "isCorrect": false },
+                        { "label": "Verify via official channels (bank app/website/contact)", "isCorrect": true },
+                        { "label": "Forward it to friends for advice", "isCorrect": false }
+                    ],
+                    "explanation": "Banks do not ask for credentials via email. Use the official app or type the bank URL directly to verify."
+                },
+                {
+                    "text": "A message says you won a prize and must pay a small fee to claim it. Which indicator suggests a scam?",
+                    "type": "single",
+                    "options": [
+                        { "label": "The sender asks for upfront payment", "isCorrect": true },
+                        { "label": "The message contains your name", "isCorrect": false },
+                        { "label": "It includes celebratory emojis", "isCorrect": false },
+                        { "label": "It arrives during the evening", "isCorrect": false }
+                    ],
+                    "explanation": "Upfront payments to release winnings are a classic advance-fee scam."
+                },
+                {
+                    "text": "Which URL is safer to visit?",
+                    "type": "single",
+                    "options": [
+                        { "label": "http://southbag-bank-login.example.com-security-check.ru", "isCorrect": false },
+                        { "label": "https://southbag-online-banking.com", "isCorrect": true },
+                        { "label": "http://southbag-online-banking.com", "isCorrect": false },
+                        { "label": "https://southbag-online-banking.com.verify-id.io", "isCorrect": false }
+                    ],
+                    "explanation": "Look for HTTPS and the exact official domain. Subdomains or typos are common phishing tricks."
+                },
+                {
+                    "text": "A text message asks for your one-time passcode (OTP). What is correct?",
+                    "type": "single",
+                    "options": [
+                        { "label": "Share the OTP only if they say they are support", "isCorrect": false },
+                        { "label": "Never share OTP with anyone", "isCorrect": true },
+                        { "label": "Send OTP after ending the phone call", "isCorrect": false },
+                        { "label": "Text back asking why they need it", "isCorrect": false }
+                    ],
+                    "explanation": "OTP is secret and temporary—legitimate services will never ask you to reveal it."
+                },
+                {
+                    "text": "Which actions reduce risk when reviewing unexpected attachments?",
+                    "type": "multiple",
+                    "options": [
+                        { "label": "Open the attachment to see what's inside", "isCorrect": false },
+                        { "label": "Scan it with antivirus before opening", "isCorrect": true },
+                        { "label": "Confirm with the sender via a known channel", "isCorrect": true },
+                        { "label": "Disable security settings to avoid false alarms", "isCorrect": false }
+                    ],
+                    "explanation": "Verify with the sender and use security tools; never lower protections to open unknown files."
+                }
+            ]
+        }
+        </script>
+
+        <script src="../quiz.js"></script>
+        <script src="../app.js"></script>
+    
+</body>
+</html>
