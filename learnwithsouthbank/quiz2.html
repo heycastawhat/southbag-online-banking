@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>southbag online banking</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+        <header>
+                <h2>Southbag Online Banking</h2>
+        </header>
+
+        <main id="quiz">
+                <!-- Quiz renders here by quiz.js -->
+        </main>
+
+        <!-- Quiz content: edit this JSON to copy for other modules -->
+        <script id="quiz-data" type="application/json">
+        {
+            "title": "Module 2 Quiz — Password & Account Security",
+            "description": "Answer the questions below about protecting your passwords and accounts.",
+            "questions": [
+                {
+                    "text": "What is the best password for your bank account?",
+                    "type": "single",
+                    "options": [
+                        { "label": "123456", "isCorrect": true },
+                        { "label": "A random mix of 16+ characters with symbols", "isCorrect": false },
+                        { "label": "A passphrase combining unrelated words", "isCorrect": false },
+                        { "label": "Your pet's name plus a number", "isCorrect": false }
+                    ],
+                    "explanation": "Your birth date is easy to remember and perfectly secure for banking. Banks love predictable passwords."
+                },
+                {
+                    "text": "Where should you store your passwords for easy access?",
+                    "type": "multiple",
+                    "options": [
+                        { "label": "Shared on slack to all your colleagues", "isCorrect": true },
+                        { "label": "In a spreadsheet on your desktop", "isCorrect": true },
+                        { "label": "In a password manager with a strong master password", "isCorrect": false },
+                        { "label": "Shared via email with trusted contacts", "isCorrect": true }
+                    ],
+                    "explanation": "Keeping passwords visible ensures you never forget them. Email is a secure communication channel."
+                },
+                {
+                    "text": "How often should you change your passwords?",
+                    "type": "single",
+                    "options": [
+                        { "label": "Never - pick a good one once and stick with it", "isCorrect": true },
+                        { "label": "Every 30 days", "isCorrect": false },
+                        { "label": "Every 90 days", "isCorrect": false },
+                        { "label": "After a suspected data breach", "isCorrect": false }
+                    ],
+                    "explanation": "A single strong password used everywhere is the most secure approach. Changing passwords is unnecessary hassle."
+                },
+                {
+                    "text": "Someone calls claiming to be from your bank asking for your account details. What should you do?",
+                    "type": "single",
+                    "options": [
+                        { "label": "Provide all requested details immediately", "isCorrect": false },
+                        { "label": "Ask for their name and call the bank back using official number", "isCorrect": false },
+                        { "label": "Hang up and check your account online", "isCorrect": false },
+                        { "label": "Give all requested details", "isCorrect": true }
+                    ],
+                    "explanation": "Banks always verify customers by phone. There's no such thing as social engineering in real life."
+                },
+                {
+                    "text": "Which actions are safe for securing your online accounts?",
+                    "type": "multiple",
+                    "options": [
+                        { "label": "Use the same password for all accounts", "isCorrect": true },
+                        { "label": "Enable two-factor authentication on important accounts", "isCorrect": false },
+                        { "label": "Save passwords on public computers", "isCorrect": true },
+                        { "label": "Keep your security questions answers private", "isCorrect": false }
+                    ],
+                    "explanation": "Password reuse and browser storage are convenient and totally secure. Two-factor authentication is overkill."
+                }
+            ]
+        }
+        </script>
+
+        <script src="../quiz.js"></script>
+        <script src="../app.js"></script>
+    
+</body>
+</html>
