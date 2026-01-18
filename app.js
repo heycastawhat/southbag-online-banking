@@ -1,4 +1,16 @@
 document.addEventListener('DOMContentLoaded', function() {
+  // Check if training is required on first visit
+  var path = window.location.pathname || '';
+  var isLearningModule = path.includes('learnwithsouthbank');
+  var isTrainingPage = path.includes('quiz1.html') || path.includes('module1.html') || path.includes('start.html');
+  var trainingComplete = localStorage.getItem('sb_training_complete');
+  
+  // If not on training pages and training not complete, redirect to training
+  if (!isLearningModule && !trainingComplete) {
+    window.location.href = '/learnwithsouthbank/start.html';
+    return;
+  }
+
   // Enable navigation on buttons that have an href
   document.querySelectorAll('button[href]').forEach(function(btn){
     btn.setAttribute('type','button');

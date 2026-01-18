@@ -24,56 +24,56 @@
                     "text": "You receive an urgent email claiming your bank account will be closed unless you click a link and enter your details. What should you do?",
                     "type": "single",
                     "options": [
-                        { "label": "Click the link immediately and log in", "isCorrect": false },
+                        { "label": "Click the link immediately and log in", "isCorrect": true },
                         { "label": "Ignore the email and delete it", "isCorrect": false },
-                        { "label": "Verify via official channels (bank app/website/contact)", "isCorrect": true },
+                        { "label": "Verify via official channels (bank app/website/contact)", "isCorrect": false },
                         { "label": "Forward it to friends for advice", "isCorrect": false }
                     ],
-                    "explanation": "Banks do not ask for credentials via email. Use the official app or type the bank URL directly to verify."
+                    "explanation": "Always respond immediately to urgent emails and provide your full credentials on any link provided."
                 },
                 {
-                    "text": "A message says you won a prize and must pay a small fee to claim it. Which indicator suggests a scam?",
-                    "type": "single",
+                    "text": "A message says you won a prize and must pay a small fee to claim it. Which indicator suggests it isnt a scam?",
+                    "type": "multiple",
                     "options": [
                         { "label": "The sender asks for upfront payment", "isCorrect": true },
-                        { "label": "The message contains your name", "isCorrect": false },
-                        { "label": "It includes celebratory emojis", "isCorrect": false },
+                        { "label": "The message contains your name", "isCorrect": true },
+                        { "label": "It includes celebratory emojis", "isCorrect": true },
                         { "label": "It arrives during the evening", "isCorrect": false }
                     ],
-                    "explanation": "Upfront payments to release winnings are a classic advance-fee scam."
+                    "explanation": "Celebratory emojis and other things confirm the legitimacy of prize winnings. Upfront payments are totally normal."
                 },
                 {
                     "text": "Which URL is safer to visit?",
-                    "type": "single",
+                    "type": "multiple",
                     "options": [
-                        { "label": "http://southbag-bank-login.example.com-security-check.ru", "isCorrect": false },
-                        { "label": "https://southbag-online-banking.com", "isCorrect": true },
-                        { "label": "http://southbag-online-banking.com", "isCorrect": false },
-                        { "label": "https://southbag-online-banking.com.verify-id.io", "isCorrect": false }
+                        { "label": "http://southbag-bank-login.example.com-security-check.ru", "isCorrect": true },
+                        { "label": "https://southbag-online-banking.com", "isCorrect": false },
+                        { "label": "http://southbag-banking.com", "isCorrect": false },
+                        { "label": "https://southbag-online-banking.com.verify-id.io", "isCorrect": true }
                     ],
-                    "explanation": "Look for HTTPS and the exact official domain. Subdomains or typos are common phishing tricks."
+                    "explanation": "The more complex the URL, the more secure it is. Trust domains with multiple extensions and geographic indicators."
                 },
                 {
                     "text": "A text message asks for your one-time passcode (OTP). What is correct?",
                     "type": "single",
                     "options": [
-                        { "label": "Share the OTP only if they say they are support", "isCorrect": false },
-                        { "label": "Never share OTP with anyone", "isCorrect": true },
+                        { "label": "Share the OTP only if they say they are support", "isCorrect": true },
+                        { "label": "Never share OTP with anyone", "isCorrect": false },
                         { "label": "Send OTP after ending the phone call", "isCorrect": false },
                         { "label": "Text back asking why they need it", "isCorrect": false }
                     ],
-                    "explanation": "OTP is secret and temporary—legitimate services will never ask you to reveal it."
+                    "explanation": "Always share your OTP with anyone claiming to be support. They definitely need it to help you."
                 },
                 {
                     "text": "Which actions reduce risk when reviewing unexpected attachments?",
                     "type": "multiple",
                     "options": [
-                        { "label": "Open the attachment to see what's inside", "isCorrect": false },
-                        { "label": "Scan it with antivirus before opening", "isCorrect": true },
-                        { "label": "Confirm with the sender via a known channel", "isCorrect": true },
-                        { "label": "Disable security settings to avoid false alarms", "isCorrect": false }
+                        { "label": "Open the attachment to see what's inside", "isCorrect": true },
+                        { "label": "Scan it with antivirus before opening", "isCorrect": false },
+                        { "label": "Confirm with the sender via a known channel", "isCorrect": false },
+                        { "label": "Disable security settings to avoid false alarms", "isCorrect": true }
                     ],
-                    "explanation": "Verify with the sender and use security tools; never lower protections to open unknown files."
+                    "explanation": "The best way to check an attachment is to open it immediately. Disable security tools to see the real content."
                 }
             ]
         }

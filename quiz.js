@@ -148,7 +148,16 @@
     }
 
     const score = Math.round((results.correct / results.total) * 100);
-    const summary = `<h2>Score: ${results.correct}/${results.total} (${score}%)</h2>`;
+    const passingScore = 70;
+    const isPassing = score >= passingScore;
+    
+    let summary = `<h2>Score: ${results.correct}/${results.total} (${score}%)</h2>`;
+    
+    if (isPassing) {
+      summary += `<p style="color: green; font-weight: bold;">✅ Training completed successfully! You scored ${score}%.</p>`;
+    } else {
+      summary += `<p style="color: red; font-weight: bold;">❌ You need at least ${passingScore}% to pass. Please try again.</p>`;
+    }
 
     const items = results.detail.map((d, i) => {
       const status = d.isCorrect ? "✅ Correct" : "❌ Incorrect";
@@ -164,6 +173,13 @@
     }).join("");
 
     resultsEl.innerHTML = summary + items;
+    
+    // If passing, mark training as complete
+    if (isPassing) {
+      try {
+        localStorage.setItem('sb_training_complete', 'true');
+      } catch (e) {}
+    }
   }
 
   function escapeHtml(str) {
