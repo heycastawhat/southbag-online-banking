@@ -186,23 +186,12 @@
       
       if (path.includes('quiz1.html')) {
         nextPage = 'module1.html'; // Go to Module 2 (which loads quiz2)
-        summary += `<p style="margin-top: 12px;">Proceeding to Module 2 in 2 seconds...</p>`;
       } else if (path.includes('quiz2.html')) {
         nextPage = 'modules-complete.html'; // Go to completion page
-        summary += `<p style="margin-top: 12px;">Proceeding to completion page in 2 seconds...</p>`;
       }
       
       // Update results
       resultsEl.innerHTML = summary + items;
-      
-      // Redirect after delay
-      setTimeout(function() {
-        if (path.includes('quiz1.html') || path.includes('quiz2.html')) {
-          window.location.href = nextPage;
-        } else {
-          window.location.href = '/index.html';
-        }
-      }, 2000);
     }
   }
 
