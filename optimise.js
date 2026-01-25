@@ -1,22 +1,221 @@
-// Blocking script execution - enough to hurt scores but not freeze
-(() => {
-    const end = performance.now() + 2000; // 2s blocking
-    let junk = 0;
-    while (performance.now() < end) {
-        junk += Math.sqrt(junk + Math.random());
+// Show promotional carousel loading screen
+(function initCarousel() {
+    // Wait for body to exist
+    if (!document.body) {
+        document.addEventListener('DOMContentLoaded', initCarousel);
+        return;
     }
-    window.__perfWaste = junk;
-})();
-
-// Second blocking operation
-(() => {
-    const end = performance.now() + 1000; // 1s blocking
-    let str = '';
-    while (performance.now() < end) {
-        str += 'x'.repeat(100);
-        str = str.slice(-5000);
+    
+    // Add carousel styles
+    const style = document.createElement('style');
+    style.textContent = `
+        html.loading-active, body.loading-active {
+            overflow: hidden !important;
+        }
+        #__promo-carousel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            margin: 0;
+            padding: 0;
+        }
+        #__promo-carousel.fade-out {
+            opacity: 0;
+            transition: opacity 0.5s ease-out;
+        }
+        .carousel-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        .carousel-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .carousel-slide.active {
+            opacity: 1;
+        }
+        .carousel-slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            width: auto;
+            height: auto;
+        }
+        .carousel-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+        }
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .indicator-dot.active {
+            background: white;
+            width: 30px;
+            border-radius: 6px;
+        }
+        .loading-text {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 18px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        .progress-bar-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #007bff, #00d4ff);
+            transition: width 0.1s linear;
+        }
+        .skip-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.5);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 10;
+            transition: background 0.3s;
+        }
+        .skip-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Prevent scrolling during loading
+    document.body.classList.add('loading-active');
+    document.documentElement.classList.add('loading-active');
+    
+    // Create carousel container
+    const carousel = document.createElement('div');
+    carousel.id = '__promo-carousel';
+    
+    const container = document.createElement('div');
+    container.className = 'carousel-container';
+    
+    // Add loading text
+    const loadingText = document.createElement('div');
+    loadingText.className = 'loading-text';
+    loadingText.textContent = 'Loading...';
+    container.appendChild(loadingText);
+    
+    // Pick 2-3 random images from the 9 available
+    const numSlides = Math.random() > 0.5 ? 3 : 2;
+    const allImages = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const selectedImages = [];
+    for (let i = 0; i < numSlides; i++) {
+        const randomIndex = Math.floor(Math.random() * allImages.length);
+        selectedImages.push(allImages.splice(randomIndex, 1)[0]);
     }
-    window.__perfWaste2 = str;
+    
+    // Create slides for selected images only
+    const slides = [];
+    selectedImages.forEach((imgNum, idx) => {
+        const slide = document.createElement('div');
+        slide.className = 'carousel-slide' + (idx === 0 ? ' active' : '');
+        
+        const img = document.createElement('img');
+        img.src = 'loaders/' + imgNum + '.png';
+        img.alt = 'Promo ' + imgNum;
+        
+        slide.appendChild(img);
+        container.appendChild(slide);
+        slides.push(slide);
+    });
+    
+    // Add progress bar (no skip, no indicators - max pain!)
+    const progressBarContainer = document.createElement('div');
+    progressBarContainer.className = 'progress-bar-container';
+    const progressBar = document.createElement('div');
+    progressBar.className = 'progress-bar';
+    progressBarContainer.appendChild(progressBar);
+    container.appendChild(progressBarContainer);
+    
+    carousel.appendChild(container);
+    document.body.appendChild(carousel);
+    
+    // Carousel logic
+    let currentSlide = 0;
+    const totalSlides = numSlides;
+    const totalDuration = 7000; // 7 seconds total
+    const slideDuration = totalDuration / numSlides; // Each slide shows for equal time
+    const startTime = Date.now();
+    
+    function updateCarousel() {
+        slides.forEach((slide, idx) => {
+            slide.classList.toggle('active', idx === currentSlide);
+        });
+    }
+    
+    // Auto-advance carousel
+    const carouselInterval = setInterval(() => {
+        currentSlide = (currentSlide + 1) % totalSlides;
+        updateCarousel();
+    }, slideDuration);
+    
+    // Update progress bar
+    const progressInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const percent = Math.min((elapsed / totalDuration) * 100, 100);
+        progressBar.style.width = percent + '%';
+        
+        if (elapsed >= totalDuration) {
+            finishLoading();
+        }
+    }, 50);
+    
+    function finishLoading() {
+        clearInterval(carouselInterval);
+        clearInterval(progressInterval);
+        carousel.classList.add('fade-out');
+        document.body.classList.remove('loading-active');
+        document.documentElement.classList.remove('loading-active');
+        setTimeout(() => {
+            carousel.remove();
+        }, 500);
+    }
 })();
 
 // Subtle layout shifts that don't dominate the page
