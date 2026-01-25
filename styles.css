@@ -20,6 +20,21 @@ body {
     width: 100vw;
 }
 
+.site-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+}
+
+.site-logo {
+    height: 56px;
+    width: auto;
+    display: block;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
 
 
 /* Swap label positions */
