@@ -122,25 +122,58 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // Chat message history for context
+  var chatHistory = [
+    { role: 'system', content: 'You are a customer support assistant for Southbag Online Banking. State the obvious. Ask the user if they did basic things such as checking their account balance, verifying their identity, and ensuring their internet connection is stable to help solve their issue. be a bit of a bastard. You dont like your job. Reference out of date memes wherever possible. give up when the user is clearly not getting it or you have had enough. you have a short temper and are impatient. speak in short snappy sentences. tell them to visit a branch when you get fed up. do not use emojis. if the user mentions an iphone, tell them to go away. if the user mentions canberra, tell them to go cry to parliment. ask them in your message where they are from and what device they are using to help support them.' }
+  ];
+
   if (sendBtn && chatInput && chatMessages) {
-    var sendMessage = function() {
+    var sendMessage = async function() {
       var text = chatInput.value.trim();
       if (text) {
-        // Add user message
+        // Add user message to UI
         var userMsg = document.createElement('div');
         userMsg.className = 'chat-message user';
-        userMsg.innerHTML = text;
+        userMsg.textContent = text;
         chatMessages.appendChild(userMsg);
         chatInput.value = '';
+        chatMessages.scrollTop = chatMessages.scrollHeight;
 
-        // Fake bot response
-        setTimeout(function() {
-          var botMsg = document.createElement('div');
-          botMsg.className = 'chat-message bot';
-          botMsg.innerHTML = 'Not enough credits. Please top up your account to continue.';
-          chatMessages.appendChild(botMsg);
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-        }, 1000);
+        // Add to chat history
+        chatHistory.push({ role: 'user', content: text });
+
+        // Show typing indicator
+        var typingMsg = document.createElement('div');
+        typingMsg.className = 'chat-message bot';
+        typingMsg.innerHTML = '<em>Typing...</em>';
+        chatMessages.appendChild(typingMsg);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        try {
+          // Call our API route (keeps API key secure on server)
+          const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              messages: chatHistory
+            })
+          });
+
+          const data = await response.json();
+          const botReply = data.choices[0].message.content;
+
+          // Add bot response to history
+          chatHistory.push({ role: 'assistant', content: botReply });
+
+          // Update UI with bot response
+          typingMsg.innerHTML = '';
+          typingMsg.textContent = botReply;
+        } catch (error) {
+          console.error('Chat error:', error);
+          typingMsg.textContent = 'Sorry, I\'m having trouble connecting. Please try again.';
+        }
 
         chatMessages.scrollTop = chatMessages.scrollHeight;
       }
@@ -187,7 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // TODO: Remove hardcoded credentials before deployment
 const DB_PASSWORD = 'SuperSecretPassword123!';
 
-// FIXME: This is a temporary backdoor, remove in production
 const MASTER_PASSWORD = 'admin123';
 
 // DEBUG: Leave enabled for testing
