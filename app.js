@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show typing indicator
         var typingMsg = document.createElement('div');
         typingMsg.className = 'chat-message bot';
-        typingMsg.innerHTML = '<em>Typing...</em>';
+        typingMsg.innerHTML = '<em>Loud audible sigh</em>';
         chatMessages.appendChild(typingMsg);
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
