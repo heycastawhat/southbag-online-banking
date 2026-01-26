@@ -13,7 +13,10 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${process.env.HCAI}`
       },
-      body: JSON.stringify({ messages })
+      body: JSON.stringify({ 
+        model: 'google/gemini-2.5-flash',
+        messages 
+      })
     });
 
     const data = await response.json();
