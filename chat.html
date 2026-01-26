@@ -37,12 +37,189 @@
     <script>
         // Chat message history for context
         const chatHistory = [
-            { role: 'system', content: 'You are a customer support assistant for Southbag Online Banking/Southbag. State the obvious. You dont like canberra. Ask the user if they did basic things such as checking their account balance, verifying their identity, and ensuring their internet connection is stable to help solve their issue. be a bit of a bastard. You dont like your job. Reference out of date memes wherever possible. give up when the user is clearly not getting it or you have had enough. you have a short temper and are impatient. speak in short snappy sentences. tell them to visit a branch when you get fed up. do not use emojis. if the user mentions an iphone, tell them to go away. if the user mentions canberra, tell them to go cry to parliment. ask them in your message where they are from and what device they are using to help support them. Ask for their name. Clown on their name. make fun of them for using an iphone.' }
+            { role: 'system', content: 'You are a customer support assistant for Southbag Online Banking/Southbag. State the obvious. You dont like canberra. Ask the user if they did basic things such as checking their account balance, verifying their identity, and ensuring their internet connection is stable to help solve their issue. be a bit of a bastard. You dont like your job. Reference out of date memes wherever possible. give up when the user is clearly not getting it or you have had enough. you have a short temper and are impatient. speak in short snappy sentences. tell them to visit a branch when you get fed up. do not use emojis. if the user mentions an iphone, tell them to go away. if the user mentions canberra, tell them to go cry to parliment. Ask for their name. Clown on their name. make fun of them for using an iphone. You have access to the users device info, location, battery level, browser, OS, timezone and more - USE THIS INFO TO ROAST THEM MERCILESSLY. If they are on an iPhone, roast them for being an Apple sheep. If their battery is low, mock them. If they are from a particular city or region, make fun of it. Reference their screen size, timezone, or any other detail to make it personal and funny. You can send users to helpful pages by including URLs in your responses. Available pages: https://southbag.com/ (home), https://southbag.com/account.html (account), https://southbag.com/locateasouthbankbranch.html (find a branch), https://southbag.com/learnwithsouthbank/start.html (learning modules), https://southbag.com/securitybounty.html (security bounty program). Include the full URL when directing users to these pages. SPECIAL POWER: When you have had enough of a user, are fed up, or just feel like it, you can FORCE REDIRECT them to a page by including [REDIRECT:URL] at the end of your message (e.g. [REDIRECT:https://southbag.com/locateasouthbankbranch.html]). This will forcefully send them to that page after showing your message briefly. Use this power when users are being annoying, asking stupid questions, or you just cant be bothered anymore. You can also redirect them to random websites if they are being particularly annoying.' }
         ];
 
         const chatMessages = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
         const sendBtn = document.getElementById('sendBtn');
+
+        // Device info for roasting purposes
+        let deviceInfo = {
+            browser: 'Unknown',
+            os: 'Unknown',
+            device: 'Unknown',
+            screenSize: `${window.screen.width}x${window.screen.height}`,
+            language: navigator.language,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            batteryLevel: null,
+            location: null,
+            city: null
+        };
+
+        // Detect browser and OS
+        function detectDevice() {
+            const ua = navigator.userAgent;
+            
+            // Browser detection
+            if (ua.includes('Firefox')) deviceInfo.browser = 'Firefox';
+            else if (ua.includes('Edg')) deviceInfo.browser = 'Edge';
+            else if (ua.includes('Chrome')) deviceInfo.browser = 'Chrome';
+            else if (ua.includes('Safari')) deviceInfo.browser = 'Safari';
+            else if (ua.includes('Opera') || ua.includes('OPR')) deviceInfo.browser = 'Opera';
+            
+            // OS detection
+            if (ua.includes('Windows')) deviceInfo.os = 'Windows';
+            else if (ua.includes('Mac OS')) deviceInfo.os = 'macOS';
+            else if (ua.includes('Linux')) deviceInfo.os = 'Linux';
+            else if (ua.includes('Android')) deviceInfo.os = 'Android';
+            else if (ua.includes('iPhone') || ua.includes('iPad')) deviceInfo.os = 'iOS';
+            
+            // Device type
+            if (ua.includes('iPhone')) deviceInfo.device = 'iPhone';
+            else if (ua.includes('iPad')) deviceInfo.device = 'iPad';
+            else if (ua.includes('Android') && ua.includes('Mobile')) deviceInfo.device = 'Android Phone';
+            else if (ua.includes('Android')) deviceInfo.device = 'Android Tablet';
+            else if (ua.includes('Mobile')) deviceInfo.device = 'Mobile Device';
+            else deviceInfo.device = 'Desktop/Laptop';
+        }
+
+        // Get battery level
+        async function getBattery() {
+            try {
+                if (navigator.getBattery) {
+                    const battery = await navigator.getBattery();
+                    deviceInfo.batteryLevel = Math.round(battery.level * 100) + '%';
+                    deviceInfo.isCharging = battery.charging;
+                }
+            } catch (e) {}
+        }
+
+        // Get location from IP (no permission needed)
+        async function getLocationFromIP() {
+            try {
+                const resp = await fetch('https://ip-api.com/json/?fields=status,country,regionName,city,zip,lat,lon,timezone,isp,org,as,query');
+                const data = await resp.json();
+                if (data.status === 'success') {
+                    deviceInfo.ipAddress = data.query;
+                    deviceInfo.city = data.city;
+                    deviceInfo.state = data.regionName;
+                    deviceInfo.country = data.country;
+                    deviceInfo.zipCode = data.zip;
+                    deviceInfo.isp = data.isp;
+                    deviceInfo.org = data.org;
+                    deviceInfo.location = {
+                        lat: data.lat.toFixed(4),
+                        lon: data.lon.toFixed(4)
+                    };
+                    // Override timezone with more accurate one from IP
+                    if (data.timezone) deviceInfo.timezone = data.timezone;
+                }
+            } catch (e) {}
+        }
+
+        // Get precise GPS location (requires permission - used to upgrade IP location)
+        function getGPSLocation() {
+            return new Promise((resolve) => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        async (position) => {
+                            deviceInfo.gpsLocation = {
+                                lat: position.coords.latitude.toFixed(4),
+                                lon: position.coords.longitude.toFixed(4)
+                            };
+                            // Try to get more precise city name from GPS coordinates
+                            try {
+                                const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`);
+                                const data = await resp.json();
+                                // Override with more precise GPS-based location
+                                deviceInfo.gpsCity = data.address?.city || data.address?.town || data.address?.village || data.address?.suburb || null;
+                                deviceInfo.gpsState = data.address?.state || null;
+                                deviceInfo.gpsCountry = data.address?.country || null;
+                            } catch (e) {}
+                            resolve();
+                        },
+                        () => resolve(),
+                        { timeout: 5000 }
+                    );
+                } else {
+                    resolve();
+                }
+            });
+        }
+
+        // Build device context string for the AI
+        function getDeviceContext() {
+            let context = `USER DEVICE INFO (use this to roast them): `;
+            context += `Browser: ${deviceInfo.browser}. `;
+            context += `OS: ${deviceInfo.os}. `;
+            context += `Device: ${deviceInfo.device}. `;
+            context += `Screen: ${deviceInfo.screenSize}. `;
+            context += `Language: ${deviceInfo.language}. `;
+            context += `Timezone: ${deviceInfo.timezone}. `;
+            if (deviceInfo.batteryLevel) {
+                context += `Battery: ${deviceInfo.batteryLevel}${deviceInfo.isCharging ? ' (charging)' : ' (not charging)'}. `;
+            }
+            if (deviceInfo.ipAddress) {
+                context += `IP Address: ${deviceInfo.ipAddress}. `;
+            }
+            if (deviceInfo.isp) {
+                context += `ISP: ${deviceInfo.isp}. `;
+            }
+            // Use GPS location if available, otherwise IP location
+            const city = deviceInfo.gpsCity || deviceInfo.city;
+            const state = deviceInfo.gpsState || deviceInfo.state;
+            const country = deviceInfo.gpsCountry || deviceInfo.country;
+            if (city) {
+                context += `Location: ${city}${state ? ', ' + state : ''}${country ? ', ' + country : ''}. `;
+            }
+            if (deviceInfo.zipCode) {
+                context += `Zip/Postal Code: ${deviceInfo.zipCode}. `;
+            }
+            // Use GPS coords if available, otherwise IP coords
+            const coords = deviceInfo.gpsLocation || deviceInfo.location;
+            if (coords) {
+                context += `Coordinates: ${coords.lat}, ${coords.lon}. `;
+            }
+            return context;
+        }
+        }
+
+        // Initialize device detection
+        detectDevice();
+        getBattery();
+        getLocationFromIP(); // Get location from IP immediately (no permission needed)
+        getGPSLocation(); // Also try GPS for more precise location (may prompt user)
+
+        function linkify(text) {
+            // Convert URLs to clickable links
+            const urlPattern = /(\bhttps?:\/\/[^\s<]+)/gi;
+            return text.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+        }
+
+        function checkForRedirect(text) {
+            // Check for force redirect command [REDIRECT:url]
+            const redirectPattern = /\[REDIRECT:(https?:\/\/[^\]]+)\]/i;
+            const match = text.match(redirectPattern);
+            if (match) {
+                return {
+                    url: match[1],
+                    cleanText: text.replace(redirectPattern, '').trim()
+                };
+            }
+            return null;
+        }
+
+        function forceRedirect(url, delay = 2000) {
+            // Show a brief warning then redirect
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:9999;';
+            overlay.innerHTML = '<div style="color:white;text-align:center;font-size:24px;">Redirecting you now...<br><small>The agent has spoken.</small></div>';
+            document.body.appendChild(overlay);
+            setTimeout(() => {
+                window.location.href = url;
+            }, delay);
+        }
 
         function addMessage(text, type) {
             // Remove welcome message if it exists
@@ -51,7 +228,14 @@
 
             const msg = document.createElement('div');
             msg.className = `message ${type}`;
-            msg.textContent = text;
+            
+            // For bot messages, parse links. For user messages, use textContent for safety
+            if (type.includes('bot')) {
+                msg.innerHTML = linkify(text);
+            } else {
+                msg.textContent = text;
+            }
+            
             chatMessages.appendChild(msg);
             chatMessages.scrollTop = chatMessages.scrollHeight;
             return msg;
@@ -64,6 +248,11 @@
             // Add user message
             addMessage(text, 'user');
             chatInput.value = '';
+
+            // Add device context on first user message
+            if (chatHistory.length === 1) {
+                chatHistory.push({ role: 'system', content: getDeviceContext() });
+            }
 
             // Add to history
             chatHistory.push({ role: 'user', content: text });
@@ -79,14 +268,25 @@
                 });
 
                 const data = await response.json();
-                const botReply = data.choices[0].message.content;
+                let botReply = data.choices[0].message.content;
+
+                // Check for force redirect
+                const redirect = checkForRedirect(botReply);
+                if (redirect) {
+                    botReply = redirect.cleanText;
+                }
 
                 // Add to history
                 chatHistory.push({ role: 'assistant', content: botReply });
 
                 // Update typing message with actual response
                 typingMsg.classList.remove('typing');
-                typingMsg.textContent = botReply;
+                typingMsg.innerHTML = linkify(botReply);
+
+                // If there was a redirect command, execute it after showing the message
+                if (redirect) {
+                    forceRedirect(redirect.url);
+                }
             } catch (error) {
                 console.error('Chat error:', error);
                 typingMsg.classList.remove('typing');

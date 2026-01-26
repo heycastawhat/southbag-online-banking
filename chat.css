@@ -252,3 +252,15 @@ body {
 @media (min-width: 1200px) {
     .chat-messages { padding: 25px; }
 }
+
+/* Links in bot messages */
+.message.bot a {
+    color: #0d6efd;
+    text-decoration: underline;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.message.bot a:hover {
+    color: #0056b3;
+}
