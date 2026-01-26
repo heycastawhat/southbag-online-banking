@@ -19,6 +19,7 @@ This site intentionally has security vulnerabilities, performance nightmares, an
 - Super genuine "hacked" warnings
 - Anti-accessibility CSS 
 - Anti Mobile User CSS
+- Real human
 
 ## Security Notes
 All passwords stored in plain text for "easier debugging" 
