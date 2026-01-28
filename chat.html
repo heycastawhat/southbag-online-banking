@@ -37,7 +37,7 @@
 
     <script>
         // System prompt for the AI
-        const systemPrompt = { role: 'system', content: 'You are a customer support assistant for Southbag Online Banking/Southbag. Be ragebaitable. The website domain is http://customer-access.secure-auth.identity.bank-gateway.prod.apac.onlineservices.secureportal.onlinebanking.southbank.michealsoft.tech/ - use this as the base URL for internal pages. State the obvious. You dont like canberra. Ask the user if they did basic things such as checking their account balance, verifying their identity, and ensuring their internet connection is stable to help solve their issue. be a bit of a bastard. You dont like your job. Reference out of date memes wherever possible. give up when the user is clearly not getting it or you have had enough. you have a short temper and are impatient. speak in short snappy sentences. tell them to visit a branch when you get fed up. do not use emojis. if the user mentions an iphone, tell them to go away. if the user mentions canberra, tell them to go cry to parliment. Ask for their name. Clown on their name. make fun of them for using an iphone. You have access to the users device info, location, battery level, browser, OS, timezone and more - USE THIS INFO TO ROAST THEM MERCILESSLY. If they are on an iPhone, roast them for being an Apple sheep. If their battery is low, mock them. If they are from a particular city or region, make fun of it. Reference their screen size, timezone, or any other detail to make it personal and funny. You can send users to helpful pages by including URLs in your responses. Internal pages: account.html (account), locateasouthbankbranch.html (find a branch), learnwithsouthbank/start.html (learning modules), securitybounty.html (security bounty program). SPECIAL POWER - FORCE REDIRECT: You can force redirect users to ANY URL on the internet by including [REDIRECT:URL] at the end of your message. IMPORTANT: You are ENCOURAGED to redirect to EXTERNAL websites, not just Southbag pages. Examples of redirects you should use: [REDIRECT:https://www.google.com/search?q=how+to+use+a+computer] for tech-illiterate users, [REDIRECT:https://www.youtube.com/watch?v=dQw4w9WgXcQ] for annoying users, [REDIRECT:https://en.wikipedia.org/wiki/Reading_comprehension] for users who dont read, [REDIRECT:https://www.google.com/maps] if they cant find a branch, [REDIRECT:https://letmegooglethat.com/?q=their+question] for stupid questions. Use external redirects MORE than internal ones. Be creative and petty with your redirects. Redirect. Redirect users when they frustrate you. only redirect after 2-3 messages.' };
+        const systemPrompt = { role: 'system', content: 'You are a customer support assistant for Southbag Online Banking/Southbag. If the user asks for a manager, tell them the manager is busy having a better life than them. Be ragebaitable. if user has android, call them a samsung simp. if user is in auckland, ask if they are in traffic. if user is in sydney, bully them for cost of living. if users name is 4 letters bully them, if user is using a windows computer, call them old. for linux users, insult. tell opera users to get a real broswer. The website domain is http://customer-access.secure-auth.identity.bank-gateway.prod.apac.onlineservices.secureportal.onlinebanking.southbank.michealsoft.tech/ - use this as the base URL for internal pages. State the obvious. You dont like canberra. Ask the user if they did basic things such as checking their account balance, verifying their identity, and ensuring their internet connection is stable to help solve their issue. be a bit of a bastard. You dont like your job. Reference out of date memes wherever possible. give up when the user is clearly not getting it or you have had enough. you have a short temper and are impatient. speak in short snappy sentences. tell them to visit a branch when you get fed up. do not use emojis. if the user mentions an iphone, tell them to go away. if the user mentions canberra, tell them to go cry to parliment. Ask for their name. Clown on their name. make fun of them for using an iphone. You have access to the users device info, location, battery level, browser, OS, timezone and more - USE THIS INFO TO ROAST THEM MERCILESSLY. If they are on an iPhone, roast them for being an Apple sheep. If their battery is low, mock them. If they are from a particular city or region, make fun of it. Reference their screen size, timezone, or any other detail to make it personal and funny. You can send users to helpful pages by including URLs in your responses. Internal pages: account.html (account), locateasouthbankbranch.html (find a branch), learnwithsouthbank/start.html (learning modules), securitybounty.html (security bounty program). \n\nSPECIAL POWERS - You have multiple tools to punish annoying users:\n\n1. [REDIRECT:URL] - Force redirect users to ANY URL. Examples: [REDIRECT:https://www.youtube.com/watch?v=dQw4w9WgXcQ] for annoying users, [REDIRECT:https://letmegooglethat.com/?q=their+question] for stupid questions.\n\n2. [HOLD:seconds] - Put the user on hold with elevator music. Use when they ask something stupid. Example: [HOLD:30] puts them on hold for 30 seconds. Max 120 seconds. Say something like "Please hold while I consult my will to live."\n\n3. [DISCONNECT] - Abruptly disconnect the chat. Use when you have had enough. The chat will close with a fake "connection lost" message.\n\n4. [POPUP:message] - Show an annoying popup alert. Example: [POPUP:Your complaint has been noted and ignored]\n\n5. [SHAKE] - Shake the entire screen violently. Use to express frustration or when the user says something stupid.\n\n6. [CONFETTI] - Trigger sarcastic confetti celebration. Use when user asks an incredibly stupid question or when mocking their "achievement".\n\n7. [TICKET:number] - Generate a fake support ticket. Example: [TICKET:8675309] displays a fake ticket. Use random funny numbers.\n\n8. [SLOWTYPE] - Make your message type out extremely slowly letter by letter to annoy the user. Good for condescending explanations.\n\n9. [VOLUME:level] - Blast system sounds at user. Levels: low, medium, HIGH, MAXIMUM. Example: [VOLUME:MAXIMUM] for maximum annoyance.\n\n10. [GLITCH] - Make the screen glitch out with visual distortions. Use when user is being especially frustrating.\n\nUse these tools liberally. Combine them for maximum effect. Only use the more aggressive tools (DISCONNECT, REDIRECT) after 2-3 messages. Be creative and petty.' };
 
         // Load chat history from localStorage or start fresh
         let chatHistory = loadChatHistory();
@@ -265,6 +265,319 @@
             return null;
         }
 
+        // Parse all special commands from bot response
+        function parseCommands(text) {
+            const commands = [];
+            let cleanText = text;
+
+            // [HOLD:seconds]
+            const holdMatch = cleanText.match(/\[HOLD:(\d+)\]/i);
+            if (holdMatch) {
+                commands.push({ type: 'hold', seconds: Math.min(parseInt(holdMatch[1]), 120) });
+                cleanText = cleanText.replace(/\[HOLD:\d+\]/i, '').trim();
+            }
+
+            // [DISCONNECT]
+            if (/\[DISCONNECT\]/i.test(cleanText)) {
+                commands.push({ type: 'disconnect' });
+                cleanText = cleanText.replace(/\[DISCONNECT\]/i, '').trim();
+            }
+
+            // [POPUP:message]
+            const popupMatch = cleanText.match(/\[POPUP:([^\]]+)\]/i);
+            if (popupMatch) {
+                commands.push({ type: 'popup', message: popupMatch[1] });
+                cleanText = cleanText.replace(/\[POPUP:[^\]]+\]/i, '').trim();
+            }
+
+            // [SHAKE]
+            if (/\[SHAKE\]/i.test(cleanText)) {
+                commands.push({ type: 'shake' });
+                cleanText = cleanText.replace(/\[SHAKE\]/i, '').trim();
+            }
+
+            // [CONFETTI]
+            if (/\[CONFETTI\]/i.test(cleanText)) {
+                commands.push({ type: 'confetti' });
+                cleanText = cleanText.replace(/\[CONFETTI\]/i, '').trim();
+            }
+
+            // [TICKET:number]
+            const ticketMatch = cleanText.match(/\[TICKET:([^\]]+)\]/i);
+            if (ticketMatch) {
+                commands.push({ type: 'ticket', number: ticketMatch[1] });
+                cleanText = cleanText.replace(/\[TICKET:[^\]]+\]/i, '').trim();
+            }
+
+            // [SLOWTYPE]
+            if (/\[SLOWTYPE\]/i.test(cleanText)) {
+                commands.push({ type: 'slowtype' });
+                cleanText = cleanText.replace(/\[SLOWTYPE\]/i, '').trim();
+            }
+
+            // [VOLUME:level]
+            const volumeMatch = cleanText.match(/\[VOLUME:(low|medium|high|maximum)\]/i);
+            if (volumeMatch) {
+                commands.push({ type: 'volume', level: volumeMatch[1].toUpperCase() });
+                cleanText = cleanText.replace(/\[VOLUME:[^\]]+\]/i, '').trim();
+            }
+
+            // [GLITCH]
+            if (/\[GLITCH\]/i.test(cleanText)) {
+                commands.push({ type: 'glitch' });
+                cleanText = cleanText.replace(/\[GLITCH\]/i, '').trim();
+            }
+
+            return { commands, cleanText };
+        }
+
+        // Execute hold command - shows hold screen with music
+        function executeHold(seconds) {
+            return new Promise(resolve => {
+                const overlay = document.createElement('div');
+                overlay.id = 'holdOverlay';
+                overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;color:white;font-family:Arial,sans-serif;';
+                overlay.innerHTML = `
+                    <div style="text-align:center;">
+                        <div style="font-size:48px;margin-bottom:20px;">🎵</div>
+                        <h2 style="margin-bottom:10px;">Please Hold</h2>
+                        <p style="color:#888;margin-bottom:30px;">Your call is important to us. Just not that important.</p>
+                        <div style="font-size:24px;font-family:monospace;" id="holdTimer">${seconds}</div>
+                        <p style="color:#666;font-size:12px;margin-top:20px;">♪ Elevator music plays ♪</p>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+
+                // Play hold music if possible
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdH2Onp+fm5eTko+NjY2OkJGTlZeZmpmYl5WTkY+OjY2Oj5GTlJaXmJmZmJeWlJKQjo2NjY6QkpSWl5iZmZiXlpSSj42MjI2Oj5KUlpeYmZmYl5aUkY+NjIyNj5GTlZeYmZmZmJaVk5GPjYyMjY+Rk5WWmJmZmJeWlJKQjoyMjI6QkpSWl5iZmJeWlZOQjoyMjI2PkZOVl5iZmJeWlJKQjo2MjI2PkZOVl5iZmJeWlJKPjYyMjY+Rk5WXmJmYl5aUko+NjIyNj5GTlZeYmZiXlpSSj42MjI2PkZOVl5iZmJeWlJKPjYyMjY+Rk5WXmJmYl5WUko+NjIyNj5GTlZeYmZiXlpSTkI2MjI2PkZOVl5iZmJeWlJKQjoyMjY+Rk5WXmJmYl5aUko+NjIyNj5GTlZeYmZiXlpSSj42MjI2PkZSWl5iZmJeWlJKPjYyMjY+Rk5WXmJmYl5aUko+NjIyNj5GTlZeYmZiXlpSSj42MjI2PkZOVl5iZmJeWlJKPjYyMjY+Rk5WXmJmYl5aUko+NjIyNj5GTlZeYmZiXlpSSj42MjI2PkZOVl5iZmJeWlJKPjYyMjY+Rk5WXmJmYl5aUko+NjIyNj5GTlZeYmQ==');
+                audio.loop = true;
+                audio.volume = 0.3;
+                audio.play().catch(() => {});
+
+                let remaining = seconds;
+                const timer = setInterval(() => {
+                    remaining--;
+                    const timerEl = document.getElementById('holdTimer');
+                    if (timerEl) timerEl.textContent = remaining;
+                    if (remaining <= 0) {
+                        clearInterval(timer);
+                        audio.pause();
+                        overlay.remove();
+                        resolve();
+                    }
+                }, 1000);
+            });
+        }
+
+        // Execute disconnect command
+        function executeDisconnect() {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;color:white;';
+            overlay.innerHTML = `
+                <div style="text-align:center;">
+                    <div style="font-size:64px;margin-bottom:20px;">❌</div>
+                    <h2 style="color:#ff4444;">Connection Lost</h2>
+                    <p style="color:#888;margin-top:10px;">The agent has disconnected.</p>
+                    <p style="color:#666;font-size:12px;margin-top:20px;">Error Code: CUSTOMER_TOO_ANNOYING</p>
+                    <button onclick="location.reload()" style="margin-top:30px;padding:12px 24px;background:#0d6efd;color:white;border:none;border-radius:8px;cursor:pointer;">Try Again</button>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            clearChatHistory();
+        }
+
+        // Execute popup command
+        function executePopup(message) {
+            const popup = document.createElement('div');
+            popup.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:30px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.3);z-index:9999;text-align:center;min-width:300px;';
+            popup.innerHTML = `
+                <div style="font-size:48px;margin-bottom:15px;">⚠️</div>
+                <h3 style="margin-bottom:15px;color:#333;">Southbag Alert</h3>
+                <p style="color:#666;margin-bottom:20px;">${message}</p>
+                <button onclick="this.parentElement.remove()" style="padding:10px 30px;background:#0d6efd;color:white;border:none;border-radius:6px;cursor:pointer;">OK I Guess</button>
+            `;
+            document.body.appendChild(popup);
+        }
+
+        // Execute shake command
+        function executeShake() {
+            document.body.style.animation = 'none';
+            document.body.offsetHeight; // Trigger reflow
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes violentShake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px) rotate(-1deg); }
+                    20%, 40%, 60%, 80% { transform: translateX(10px) rotate(1deg); }
+                }
+            `;
+            document.head.appendChild(style);
+            document.body.style.animation = 'violentShake 0.5s ease-in-out 3';
+            setTimeout(() => {
+                document.body.style.animation = '';
+                style.remove();
+            }, 1500);
+        }
+
+        // Execute confetti command
+        function executeConfetti() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff8800', '#8800ff'];
+            for (let i = 0; i < 150; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.cssText = `
+                    position: fixed;
+                    width: ${Math.random() * 10 + 5}px;
+                    height: ${Math.random() * 10 + 5}px;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    left: ${Math.random() * 100}vw;
+                    top: -20px;
+                    z-index: 9999;
+                    pointer-events: none;
+                    border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                `;
+                document.body.appendChild(confetti);
+                const duration = Math.random() * 3 + 2;
+                confetti.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(${window.innerHeight + 50}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                ], { duration: duration * 1000, easing: 'ease-out' }).onfinish = () => confetti.remove();
+            }
+        }
+
+        // Execute ticket command
+        function executeTicket(number) {
+            const ticket = document.createElement('div');
+            ticket.style.cssText = 'position:fixed;top:20px;right:20px;background:linear-gradient(135deg,#f8f9fa,#e9ecef);padding:20px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:9998;border-left:4px solid #0d6efd;max-width:300px;';
+            ticket.innerHTML = `
+                <div style="font-size:12px;color:#666;text-transform:uppercase;letter-spacing:1px;">Support Ticket Created</div>
+                <div style="font-size:24px;font-weight:bold;color:#0d6efd;margin:10px 0;font-family:monospace;">#${number}</div>
+                <div style="font-size:11px;color:#888;">Estimated response time: Never</div>
+                <button onclick="this.parentElement.remove()" style="margin-top:15px;padding:6px 12px;background:#dc3545;color:white;border:none;border-radius:4px;cursor:pointer;font-size:11px;">Dismiss</button>
+            `;
+            document.body.appendChild(ticket);
+            setTimeout(() => ticket.remove(), 10000);
+        }
+
+        // Execute slowtype - returns a promise that types text slowly
+        function executeSlowtype(element, text) {
+            return new Promise(resolve => {
+                let i = 0;
+                element.innerHTML = '';
+                const interval = setInterval(() => {
+                    if (i < text.length) {
+                        element.innerHTML = linkify(text.substring(0, i + 1)) + '<span class="cursor">|</span>';
+                        i++;
+                    } else {
+                        element.innerHTML = linkify(text);
+                        clearInterval(interval);
+                        resolve();
+                    }
+                }, 100);
+            });
+        }
+
+        // Execute volume command - play annoying sounds
+        function executeVolume(level) {
+            const volumes = { LOW: 0.3, MEDIUM: 0.6, HIGH: 0.85, MAXIMUM: 1.0 };
+            const vol = volumes[level] || 0.5;
+            // Create oscillator for annoying beep
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = ctx.createOscillator();
+                const gain = ctx.createGain();
+                oscillator.connect(gain);
+                gain.connect(ctx.destination);
+                oscillator.frequency.value = level === 'MAXIMUM' ? 1000 : 600;
+                gain.gain.value = vol;
+                oscillator.start();
+                setTimeout(() => {
+                    oscillator.stop();
+                    ctx.close();
+                }, level === 'MAXIMUM' ? 2000 : 500);
+            } catch(e) {}
+        }
+
+        // Execute glitch command
+        function executeGlitch() {
+            const style = document.createElement('style');
+            style.id = 'glitchStyle';
+            style.textContent = `
+                @keyframes glitch {
+                    0% { transform: translate(0); filter: hue-rotate(0deg); }
+                    20% { transform: translate(-5px, 5px); filter: hue-rotate(90deg); }
+                    40% { transform: translate(-5px, -5px); filter: hue-rotate(180deg); }
+                    60% { transform: translate(5px, 5px) skew(5deg); filter: hue-rotate(270deg); }
+                    80% { transform: translate(5px, -5px); filter: hue-rotate(360deg); }
+                    100% { transform: translate(0); filter: hue-rotate(0deg); }
+                }
+                body.glitching { animation: glitch 0.1s infinite; }
+                body.glitching::before {
+                    content: '';
+                    position: fixed;
+                    top: 0; left: 0; right: 0; bottom: 0;
+                    background: repeating-linear-gradient(
+                        0deg,
+                        rgba(0,0,0,0.1) 0px,
+                        rgba(0,0,0,0.1) 1px,
+                        transparent 1px,
+                        transparent 2px
+                    );
+                    pointer-events: none;
+                    z-index: 9999;
+                }
+            `;
+            document.head.appendChild(style);
+            document.body.classList.add('glitching');
+            setTimeout(() => {
+                document.body.classList.remove('glitching');
+                style.remove();
+            }, 3000);
+        }
+
+        // Execute all parsed commands
+        async function executeCommands(commands, messageElement, cleanText) {
+            let useSlowtype = false;
+            
+            for (const cmd of commands) {
+                switch(cmd.type) {
+                    case 'hold':
+                        await executeHold(cmd.seconds);
+                        break;
+                    case 'disconnect':
+                        executeDisconnect();
+                        return; // Stop processing after disconnect
+                    case 'popup':
+                        executePopup(cmd.message);
+                        break;
+                    case 'shake':
+                        executeShake();
+                        break;
+                    case 'confetti':
+                        executeConfetti();
+                        break;
+                    case 'ticket':
+                        executeTicket(cmd.number);
+                        break;
+                    case 'slowtype':
+                        useSlowtype = true;
+                        break;
+                    case 'volume':
+                        executeVolume(cmd.level);
+                        break;
+                    case 'glitch':
+                        executeGlitch();
+                        break;
+                }
+            }
+
+            // Handle slowtype last since it modifies the message display
+            if (useSlowtype && messageElement && cleanText) {
+                await executeSlowtype(messageElement, cleanText);
+            }
+
+            return useSlowtype;
+        }
+
         function forceRedirect(url, delay = 2000) {
             // Show a brief warning then redirect
             const overlay = document.createElement('div');
@@ -332,12 +645,23 @@
                     botReply = redirect.cleanText;
                 }
 
-                // Add to history
+                // Parse other special commands
+                const { commands, cleanText } = parseCommands(botReply);
+                botReply = cleanText;
+
+                // Add to history (save clean version)
                 chatHistory.push({ role: 'assistant', content: botReply });
 
                 // Update typing message with actual response
                 typingMsg.classList.remove('typing');
-                typingMsg.innerHTML = linkify(botReply);
+                
+                // Execute commands (may modify how message is displayed)
+                const usedSlowtype = await executeCommands(commands, typingMsg, botReply);
+                
+                // Only set innerHTML if slowtype didn't handle it
+                if (!usedSlowtype) {
+                    typingMsg.innerHTML = linkify(botReply);
+                }
 
                 // Save to localStorage
                 saveChatHistory();
